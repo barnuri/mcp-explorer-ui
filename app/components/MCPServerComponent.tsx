@@ -1,18 +1,26 @@
 import { useEffect, useState } from 'react';
-import { getTools, type MCPTool } from '../helpers/mcp';
+import { getTools, getPrompts, getResources, type MCPTool, type MCPPrompt, type MCPResource } from '../helpers/mcp';
 import type { MCPServer } from '../models/MCPServer';
 import { MCPToolComponent } from './MCPToolComponent';
 
 export default function MCPServerComponent({ server }: { server: MCPServer }) {
     const [tools, setTools] = useState([] as MCPTool[]);
-    const [loadingTools, setLoadingTools] = useState(false);
+    const [prompts, setPrompts] = useState([] as MCPPrompt[]);
+    const [resources, setResources] = useState([] as MCPResource[]);
+    const [loading, setLoading] = useState(false);
+    const [activeTab, setActiveTab] = useState('tools');
 
     useEffect(() => {
         if (server?.sseUrl) {
-            setLoadingTools(true);
-            getTools(new URL(server.sseUrl))
-                .then(data => setTools(data))
-                .finally(() => setLoadingTools(false));
+            setLoading(true);
+            const url = new URL(server.sseUrl);
+            Promise.all([getTools(url), getPrompts(url), getResources(url)])
+                .then(([toolsData, promptsData, resourcesData]) => {
+                    setTools(toolsData);
+                    setPrompts(promptsData);
+                    setResources(resourcesData);
+                })
+                .finally(() => setLoading(false));
         }
     }, [server]);
 
@@ -32,16 +40,52 @@ export default function MCPServerComponent({ server }: { server: MCPServer }) {
                     </span>
                 ))}
             </div>
-            <h2 className='mt-6 text-2xl font-bold'>Tools</h2>
-            {loadingTools ? (
-                <p className='text-center text-lg font-semibold'>Loading tools...</p>
-            ) : (
-                <ul className='mt-2 space-y-2'>
-                    {tools.map((tool, i) => (
-                        <MCPToolComponent key={i} tool={tool} />
+            <div className='mt-6'>
+                <div className='flex border-b'>
+                    {['tools', 'prompts', 'resources'].map(tab => (
+                        <button
+                            key={tab}
+                            onClick={() => setActiveTab(tab)}
+                            className={`px-4 py-2 font-semibold ${activeTab === tab ? 'border-b-2 border-blue-500 text-blue-500' : 'text-gray-500'}`}
+                        >
+                            {tab.charAt(0).toUpperCase() + tab.slice(1)}
+                        </button>
                     ))}
-                </ul>
-            )}
+                </div>
+                {loading ? (
+                    <p className='text-center text-lg font-semibold'>Loading {activeTab}...</p>
+                ) : (
+                    <div className='mt-4'>
+                        {activeTab === 'tools' && (
+                            <ul className='space-y-2'>
+                                {tools.map((tool, i) => (
+                                    <MCPToolComponent key={i} tool={tool} />
+                                ))}
+                            </ul>
+                        )}
+                        {activeTab === 'prompts' && (
+                            <ul className='space-y-2'>
+                                {prompts.map((prompt, i) => (
+                                    <li key={i} className='p-3 border rounded-lg bg-gray-100 dark:bg-gray-800'>
+                                        {prompt.name}
+                                        {prompt.description}
+                                    </li>
+                                ))}
+                            </ul>
+                        )}
+                        {activeTab === 'resources' && (
+                            <ul className='space-y-2'>
+                                {resources.map((resource, i) => (
+                                    <li key={i} className='p-3 border rounded-lg bg-gray-100 dark:bg-gray-800'>
+                                        {resource.name}
+                                        {resource.description}
+                                    </li>
+                                ))}
+                            </ul>
+                        )}
+                    </div>
+                )}
+            </div>
         </main>
     );
 }
