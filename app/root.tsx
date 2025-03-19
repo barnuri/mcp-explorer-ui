@@ -1,8 +1,7 @@
 import { isRouteErrorResponse, Links, Meta, Outlet, Scripts, ScrollRestoration } from 'react-router';
-import { useState } from 'react';
-
 import type { Route } from './+types/root';
 import './app.css';
+import { DarkModeToggle } from './components/DarkModeToggle';
 
 export const links: Route.LinksFunction = () => [
     { rel: 'preconnect', href: 'https://fonts.googleapis.com' },
@@ -18,20 +17,16 @@ export const links: Route.LinksFunction = () => [
 ];
 
 export function Layout({ children }: { children: React.ReactNode }) {
-    const [darkMode, setDarkMode] = useState(true);
-
     return (
-        <html lang='en' className={darkMode ? 'dark' : ''}>
+        <html lang='en'>
             <head>
                 <meta charSet='utf-8' />
                 <meta name='viewport' content='width=device-width, initial-scale=1' />
                 <Meta />
                 <Links />
             </head>
-            <body>
-                <button onClick={() => setDarkMode(!darkMode)} className='absolute top-4 right-4 p-2 border rounded'>
-                    {darkMode ? 'Light Mode' : 'Dark Mode'}
-                </button>
+            <body className='min-h-screen font-sans'>
+                <DarkModeToggle />
                 {children}
                 <ScrollRestoration />
                 <Scripts />
