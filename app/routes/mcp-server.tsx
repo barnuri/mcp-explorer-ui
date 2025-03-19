@@ -2,28 +2,34 @@ import { useParams } from 'react-router';
 import { useEffect, useState } from 'react';
 import getConfig from '../helpers/getConfig';
 import type { MCPServer } from '../models/MCPServer';
-import type { MCPTool } from '../models/MCPTool';
+import { getTools, type MCPTool } from '../helpers/mcp';
+import { MCPToolComponent } from './MCPToolComponent';
 
 export default function McpServer() {
     const { id } = useParams();
     const [server, setServer] = useState(null as MCPServer | null);
     const [tools, setTools] = useState([] as MCPTool[]);
+    const [loadingConfig, setLoadingConfig] = useState(true);
+    const [loadingTools, setLoadingTools] = useState(false);
 
     useEffect(() => {
-        getConfig().then(data => setServer(data.mcpServers[Number(id)]));
+        setLoadingConfig(true);
+        getConfig()
+            .then(data => setServer(data.mcpServers[Number(id)]))
+            .finally(() => setLoadingConfig(false));
     }, [id]);
 
     useEffect(() => {
         if (server?.sseUrl) {
-            const eventSource = new EventSource(server.sseUrl);
-            eventSource.onmessage = event => {
-                setTools(prev => [...prev, JSON.parse(event.data)]);
-            };
-            return () => eventSource.close();
+            setLoadingTools(true);
+            getTools(new URL(server.sseUrl))
+                .then(data => setTools(data))
+                .finally(() => setLoadingTools(false));
         }
     }, [server]);
 
-    if (!server) return <p className='text-center text-lg font-semibold'>Loading...</p>;
+    if (loadingConfig) return <p className='text-center text-lg font-semibold'>Loading configuration...</p>;
+    if (!server) return <p className='text-center text-lg font-semibold'>Server not found.</p>;
 
     return (
         <main className='p-4 max-w-4xl mx-auto'>
@@ -40,13 +46,15 @@ export default function McpServer() {
                 ))}
             </div>
             <h2 className='mt-6 text-2xl font-bold'>Tools</h2>
-            <ul className='mt-2 space-y-2'>
-                {tools.map((tool, i) => (
-                    <li key={i} className='p-3 border rounded-lg bg-gray-100 dark:bg-gray-800 hover:shadow-md transition-shadow'>
-                        {tool.name}
-                    </li>
-                ))}
-            </ul>
+            {loadingTools ? (
+                <p className='text-center text-lg font-semibold'>Loading tools...</p>
+            ) : (
+                <ul className='mt-2 space-y-2'>
+                    {tools.map((tool, i) => (
+                        <MCPToolComponent key={i} tool={tool} />
+                    ))}
+                </ul>
+            )}
         </main>
     );
 }
