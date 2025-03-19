@@ -1,4 +1,4 @@
-import { isRouteErrorResponse, Links, Meta, Outlet, Scripts, ScrollRestoration } from 'react-router';
+import { isRouteErrorResponse, Links, Meta, Outlet, Scripts, ScrollRestoration, Link } from 'react-router';
 import type { Route } from './+types/root';
 import './app.css';
 import { DarkModeToggle } from './components/DarkModeToggle';
@@ -26,6 +26,11 @@ export function Layout({ children }: { children: React.ReactNode }) {
                 <Links />
             </head>
             <body className='min-h-screen font-sans'>
+                <header className='flex items-center p-4 bg-gray-200 dark:bg-gray-800'>
+                    <Link to='/' className='text-2xl font-bold text-blue-600 dark:text-blue-400'>
+                        MCP Explorer
+                    </Link>
+                </header>
                 <DarkModeToggle />
                 {children}
                 <ScrollRestoration />
