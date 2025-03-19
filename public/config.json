@@ -1,0 +1,22 @@
+{
+    "mcpServers": [
+        {
+            "name": "Server 1",
+            "description": "Description for Server 1",
+            "labels": [
+                "Label1",
+                "Label2"
+            ],
+            "sseUrl": "https://example.com/sse1"
+        },
+        {
+            "name": "Server 2",
+            "description": "Description for Server 2",
+            "labels": [
+                "Label3",
+                "Label4"
+            ],
+            "sseUrl": "https://example.com/sse2"
+        }
+    ]
+}
