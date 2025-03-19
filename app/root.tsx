@@ -30,6 +30,11 @@ export function Layout({ children }: { children: React.ReactNode }) {
                     <Link to='/' className='text-2xl font-bold text-blue-600 dark:text-blue-400'>
                         MCP Explorer
                     </Link>
+                    <nav className='ml-4'>
+                        <Link to='/url-viewer' className='text-blue-500 hover:underline'>
+                            MCP SSE URL Viewer
+                        </Link>
+                    </nav>
                 </header>
                 <DarkModeToggle />
                 {children}
