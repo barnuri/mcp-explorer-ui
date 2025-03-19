@@ -5,7 +5,8 @@
   "scripts": {
     "build": "react-router build",
     "dev": "react-router dev",
-    "start": "react-router-serve ./build/server/index.js",
+    "start": "serve ./build/client",
+    "start:ssr": "react-router-serve ./build/server/index.js",
     "typecheck": "react-router typegen && tsc"
   },
   "dependencies": {
@@ -15,7 +16,8 @@
     "isbot": "^5.1.17",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
-    "react-router": "^7.4.0"
+    "react-router": "^7.4.0",
+    "serve": "^14.2.4"
   },
   "devDependencies": {
     "@react-router/dev": "^7.4.0",
