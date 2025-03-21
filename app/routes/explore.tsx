@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router';
+import { Input, Card, Row, Col } from 'antd';
 import getConfig from '../helpers/getConfig';
 import type { MCPServer } from '../models/MCPServer';
 
@@ -14,36 +15,31 @@ export default function Explore() {
     const filteredServers = servers.filter(server => JSON.stringify(server).toLowerCase().includes(search.toLowerCase()));
 
     return (
-        <main className='p-4 max-w-6xl mx-auto'>
-            <input
-                type='text'
+        <main style={{ padding: '24px', maxWidth: '1200px', margin: '0 auto' }}>
+            <Input
                 placeholder='Search MCP Servers...'
                 value={search}
                 onChange={e => setSearch(e.target.value)}
-                className='w-full p-3 mb-6 border rounded-lg dark:bg-gray-800 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500'
+                style={{ marginBottom: '24px' }}
             />
-            <div className='grid grid-cols-1 md:grid-cols-3 gap-6'>
+            <Row gutter={[16, 16]}>
                 {filteredServers.map((server, index) => (
-                    <Link
-                        key={index}
-                        to={`/mcp-server/${index}`}
-                        className='p-4 border rounded-lg bg-gray-100 dark:bg-gray-800 hover:shadow-lg transition-shadow'
-                    >
-                        <h2 className='text-xl font-bold mb-2'>{server.name}</h2>
-                        <p className='text-gray-600 dark:text-gray-300'>{server.description}</p>
-                        <div className='flex flex-wrap gap-2 mt-3'>
-                            {server.labels.map((label, i) => (
-                                <span
-                                    key={i}
-                                    className='px-3 py-1 text-sm font-medium bg-green-100 text-green-800 dark:bg-green-800 dark:text-green-100 rounded-full'
-                                >
-                                    {label}
-                                </span>
-                            ))}
-                        </div>
-                    </Link>
+                    <Col key={index} xs={24} sm={12} md={8}>
+                        <Link to={`/mcp-server/${index}`}>
+                            <Card title={server.name} hoverable>
+                                <p>{server.description}</p>
+                                <div>
+                                    {server.labels.map((label, i) => (
+                                        <Tag key={i} color='green'>
+                                            {label}
+                                        </Tag>
+                                    ))}
+                                </div>
+                            </Card>
+                        </Link>
+                    </Col>
                 ))}
-            </div>
+            </Row>
         </main>
     );
 }
