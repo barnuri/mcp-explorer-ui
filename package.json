@@ -12,7 +12,8 @@
         "dev": "react-router dev",
         "start": "serve ./build/client",
         "start:ssr": "react-router-serve ./build/server/index.js",
-        "typecheck": "react-router typegen && tsc"
+        "typecheck": "react-router typegen && tsc",
+        "deploy": "npm run build && npx gh-pages -d build"
     },
     "dependencies": {
         "@modelcontextprotocol/sdk": "^1.7.0",
