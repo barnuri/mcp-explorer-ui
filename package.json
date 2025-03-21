@@ -16,6 +16,7 @@
         "deploy": "npm run build && npx gh-pages -d build"
     },
     "dependencies": {
+        "antd": "^5.24.4",
         "@modelcontextprotocol/sdk": "^1.7.0",
         "@react-router/node": "^7.4.0",
         "@react-router/serve": "^7.4.0",
