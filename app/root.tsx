@@ -24,17 +24,21 @@ export const links: Route.LinksFunction = () => [
 ];
 
 export function Layout({ children }: { children: React.ReactNode }) {
-    const [isDarkMode, setIsDarkMode] = useState<boolean>(false);
+    // Initialize with true for dark mode by default
+    const [isDarkMode, setIsDarkMode] = useState<boolean>(true);
 
-    // Listen for theme changes
+    // Listen for theme changes and set initial state
     useEffect(() => {
         const checkTheme = () => {
             const isDark = document.body.className.includes('dark-theme');
             setIsDarkMode(isDark);
         };
 
-        // Check initial theme
-        checkTheme();
+        // Check stored preference on initial load
+        const storedPreference = localStorage.getItem('darkMode');
+        if (storedPreference !== null) {
+            setIsDarkMode(storedPreference === 'true');
+        }
 
         // Listen for theme changes
         window.addEventListener('themeChange', checkTheme);
@@ -42,14 +46,14 @@ export function Layout({ children }: { children: React.ReactNode }) {
     }, []);
 
     return (
-        <html lang='en'>
+        <html lang='en' data-theme={isDarkMode ? 'dark' : 'light'}>
             <head>
                 <meta charSet='utf-8' />
                 <meta name='viewport' content='width=device-width, initial-scale=1' />
                 <Meta />
                 <Links />
             </head>
-            <body>
+            <body className={isDarkMode ? 'dark-theme' : 'light-theme'}>
                 <ConfigProvider
                     theme={{
                         algorithm: isDarkMode ? darkAlgorithm : defaultAlgorithm,

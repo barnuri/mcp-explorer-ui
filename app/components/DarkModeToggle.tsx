@@ -3,7 +3,7 @@ import { Button, theme } from 'antd';
 import { MoonOutlined, SunOutlined } from '@ant-design/icons';
 
 export function DarkModeToggle() {
-    const [darkMode, setDarkMode] = useState(false);
+    const [darkMode, setDarkMode] = useState(true); // Initialize as true by default
     const { token } = theme.useToken();
 
     useLayoutEffect(() => {
@@ -16,7 +16,7 @@ export function DarkModeToggle() {
         // Apply dark mode to both document and Ant Design components
         document.documentElement.setAttribute('data-theme', darkMode ? 'dark' : 'light');
         document.documentElement.classList.toggle('dark', darkMode);
-        document.documentElement.classList.add('transition-colors', 'duration-300');
+        document.documentElement.style.colorScheme = darkMode ? 'dark' : 'light';
         window.localStorage.setItem('darkMode', darkMode.toString());
 
         // Apply to body for Ant Design styling
@@ -33,7 +33,7 @@ export function DarkModeToggle() {
             icon={darkMode ? <SunOutlined /> : <MoonOutlined />}
             style={{
                 marginLeft: 'auto',
-                color: token.colorTextBase,
+                color: darkMode ? token.colorTextBase : 'white',
             }}
         >
             {darkMode ? 'Light Mode' : 'Dark Mode'}
