@@ -1,10 +1,11 @@
 import { isRouteErrorResponse, Links, Meta, Outlet, Scripts, ScrollRestoration } from 'react-router';
-import { Layout, Menu, Button } from 'antd';
+import { Layout as AntLayout, Menu } from 'antd';
 import type { Route } from './+types/root';
 import './app.css';
 import { DarkModeToggle } from './components/DarkModeToggle';
+import '@ant-design/v5-patch-for-react-19';
 
-const { Header, Content } = Layout;
+const { Header, Content } = AntLayout;
 
 export const links: Route.LinksFunction = () => [
     { rel: 'preconnect', href: 'https://fonts.googleapis.com' },
@@ -19,7 +20,7 @@ export const links: Route.LinksFunction = () => [
     },
 ];
 
-export function AppLayout({ children }: { children: React.ReactNode }) {
+export function Layout({ children }: { children: React.ReactNode }) {
     return (
         <html lang='en'>
             <head>
@@ -29,23 +30,22 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
                 <Links />
             </head>
             <body>
-                <Layout style={{ minHeight: '100vh' }}>
+                <AntLayout style={{ minHeight: '100vh' }}>
                     <Header style={{ display: 'flex', alignItems: 'center' }}>
                         <div className='logo' />
-                        <Menu theme='dark' mode='horizontal' defaultSelectedKeys={['1']}>
-                            <Menu.Item key='1'>
-                                <a href='/'>Explorer</a>
-                            </Menu.Item>
-                            <Menu.Item key='2'>
-                                <a href='/url-viewer'>SSE Url Viewer</a>
-                            </Menu.Item>
-                        </Menu>
+                        <Menu
+                            theme='dark'
+                            mode='horizontal'
+                            items={[
+                                { key: '1', label: 'Explorer' },
+                                { key: '2', label: 'SSE Url Viewer' },
+                            ]}
+                            defaultSelectedKeys={['1']}
+                        ></Menu>
                         <DarkModeToggle />
                     </Header>
-                    <Content style={{ padding: '0 50px' }}>
-                        {children}
-                    </Content>
-                </Layout>
+                    <Content style={{ padding: '0 50px' }}>{children}</Content>
+                </AntLayout>
                 <ScrollRestoration />
                 <Scripts />
             </body>

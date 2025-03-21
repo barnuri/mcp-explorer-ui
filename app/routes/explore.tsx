@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router';
-import { Input, Card, Row, Col } from 'antd';
+import { Input, Card, Row, Col, Tag } from 'antd';
 import getConfig from '../helpers/getConfig';
 import type { MCPServer } from '../models/MCPServer';
 
@@ -16,12 +16,7 @@ export default function Explore() {
 
     return (
         <main style={{ padding: '24px', maxWidth: '1200px', margin: '0 auto' }}>
-            <Input
-                placeholder='Search MCP Servers...'
-                value={search}
-                onChange={e => setSearch(e.target.value)}
-                style={{ marginBottom: '24px' }}
-            />
+            <Input placeholder='Search MCP Servers...' value={search} onChange={e => setSearch(e.target.value)} style={{ marginBottom: '24px' }} />
             <Row gutter={[16, 16]}>
                 {filteredServers.map((server, index) => (
                     <Col key={index} xs={24} sm={12} md={8}>
