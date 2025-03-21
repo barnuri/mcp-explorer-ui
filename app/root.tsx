@@ -1,11 +1,14 @@
-import { isRouteErrorResponse, Links, Meta, Outlet, Scripts, ScrollRestoration } from 'react-router';
-import { Layout as AntLayout, Menu } from 'antd';
+import { isRouteErrorResponse, Links, Meta, Outlet, Scripts, ScrollRestoration, useRouteError } from 'react-router';
+import { Layout as AntLayout, Menu, ConfigProvider, theme } from 'antd';
+import { Link } from 'react-router';
 import type { Route } from './+types/root';
 import './app.css';
 import { DarkModeToggle } from './components/DarkModeToggle';
 import '@ant-design/v5-patch-for-react-19';
+import { useEffect, useState } from 'react';
 
-const { Header, Content } = AntLayout;
+const { Header, Content, Footer } = AntLayout;
+const { darkAlgorithm, defaultAlgorithm } = theme;
 
 export const links: Route.LinksFunction = () => [
     { rel: 'preconnect', href: 'https://fonts.googleapis.com' },
@@ -21,6 +24,23 @@ export const links: Route.LinksFunction = () => [
 ];
 
 export function Layout({ children }: { children: React.ReactNode }) {
+    const [isDarkMode, setIsDarkMode] = useState<boolean>(false);
+
+    // Listen for theme changes
+    useEffect(() => {
+        const checkTheme = () => {
+            const isDark = document.body.className.includes('dark-theme');
+            setIsDarkMode(isDark);
+        };
+
+        // Check initial theme
+        checkTheme();
+
+        // Listen for theme changes
+        window.addEventListener('themeChange', checkTheme);
+        return () => window.removeEventListener('themeChange', checkTheme);
+    }, []);
+
     return (
         <html lang='en'>
             <head>
@@ -30,22 +50,41 @@ export function Layout({ children }: { children: React.ReactNode }) {
                 <Links />
             </head>
             <body>
-                <AntLayout style={{ minHeight: '100vh' }}>
-                    <Header style={{ display: 'flex', alignItems: 'center' }}>
-                        <div className='logo' />
-                        <Menu
-                            theme='dark'
-                            mode='horizontal'
-                            items={[
-                                { key: '1', label: 'Explorer' },
-                                { key: '2', label: 'SSE Url Viewer' },
-                            ]}
-                            defaultSelectedKeys={['1']}
-                        ></Menu>
-                        <DarkModeToggle />
-                    </Header>
-                    <Content style={{ padding: '0 50px' }}>{children}</Content>
-                </AntLayout>
+                <ConfigProvider
+                    theme={{
+                        algorithm: isDarkMode ? darkAlgorithm : defaultAlgorithm,
+                        token: {
+                            colorBgBase: isDarkMode ? '#1f1f1f' : '#ffffff',
+                            colorTextBase: isDarkMode ? '#ffffff' : '#000000',
+                            borderRadius: 6,
+                        },
+                    }}
+                >
+                    <AntLayout style={{ minHeight: '100vh' }}>
+                        <Header style={{ display: 'flex', alignItems: 'center' }}>
+                            <div className='logo' />
+                            <Menu
+                                theme={isDarkMode ? 'dark' : 'light'}
+                                mode='horizontal'
+                                items={[
+                                    { key: '1', label: <Link to='/'>Explorer</Link> },
+                                    { key: '2', label: <Link to='/url-viewer'>SSE Url Viewer</Link> },
+                                ]}
+                                defaultSelectedKeys={['1']}
+                                style={{ flex: 1 }}
+                            ></Menu>
+                            <DarkModeToggle />
+                        </Header>
+                        <Content
+                            style={{
+                                padding: '0 50px',
+                                backgroundColor: isDarkMode ? '#141414' : '#f0f2f5',
+                            }}
+                        >
+                            {children}
+                        </Content>
+                    </AntLayout>
+                </ConfigProvider>
                 <ScrollRestoration />
                 <Scripts />
             </body>
@@ -57,7 +96,8 @@ export default function App() {
     return <Outlet />;
 }
 
-export function ErrorBoundary({ error }: Route.ErrorBoundaryProps) {
+export function ErrorBoundary() {
+    const error = useRouteError();
     let message = 'Oops!';
     let details = 'An unexpected error occurred.';
     let stack: string | undefined;

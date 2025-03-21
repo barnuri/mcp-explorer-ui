@@ -1,24 +1,40 @@
 import { useEffect, useLayoutEffect, useState } from 'react';
-import { Button } from 'antd';
+import { Button, theme } from 'antd';
+import { MoonOutlined, SunOutlined } from '@ant-design/icons';
 
 export function DarkModeToggle() {
     const [darkMode, setDarkMode] = useState(false);
+    const { token } = theme.useToken();
 
     useLayoutEffect(() => {
-        setDarkMode((window.localStorage.getItem('darkMode') || 'true') === 'true');
+        // Default to dark mode if no preference is stored
+        const storedPreference = window.localStorage.getItem('darkMode');
+        setDarkMode(storedPreference === null ? true : storedPreference === 'true');
     }, []);
 
     useEffect(() => {
+        // Apply dark mode to both document and Ant Design components
+        document.documentElement.setAttribute('data-theme', darkMode ? 'dark' : 'light');
         document.documentElement.classList.toggle('dark', darkMode);
         document.documentElement.classList.add('transition-colors', 'duration-300');
-        (document.querySelector('html') as any).className = darkMode ? 'dark bg-gray-900 text-white' : 'bg-gray-100 text-gray-900';
         window.localStorage.setItem('darkMode', darkMode.toString());
+
+        // Apply to body for Ant Design styling
+        document.body.className = darkMode ? 'dark-theme' : 'light-theme';
+
+        // Manually dispatch an event for any components that need to react to theme changes
+        window.dispatchEvent(new Event('themeChange'));
     }, [darkMode]);
 
     return (
         <Button
+            type='text'
             onClick={() => setDarkMode(!darkMode)}
-            className='absolute top-4 right-4 p-2 border rounded bg-gray-200 dark:bg-gray-800 hover:bg-gray-300 dark:hover:bg-gray-700 transition-colors'
+            icon={darkMode ? <SunOutlined /> : <MoonOutlined />}
+            style={{
+                marginLeft: 'auto',
+                color: token.colorTextBase,
+            }}
         >
             {darkMode ? 'Light Mode' : 'Dark Mode'}
         </Button>
