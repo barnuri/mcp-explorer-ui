@@ -1,7 +1,10 @@
-import { isRouteErrorResponse, Links, Meta, Outlet, Scripts, ScrollRestoration, Link } from 'react-router';
+import { isRouteErrorResponse, Links, Meta, Outlet, Scripts, ScrollRestoration } from 'react-router';
+import { Layout, Menu, Button } from 'antd';
 import type { Route } from './+types/root';
 import './app.css';
 import { DarkModeToggle } from './components/DarkModeToggle';
+
+const { Header, Content } = Layout;
 
 export const links: Route.LinksFunction = () => [
     { rel: 'preconnect', href: 'https://fonts.googleapis.com' },
@@ -16,7 +19,7 @@ export const links: Route.LinksFunction = () => [
     },
 ];
 
-export function Layout({ children }: { children: React.ReactNode }) {
+export function AppLayout({ children }: { children: React.ReactNode }) {
     return (
         <html lang='en'>
             <head>
@@ -25,28 +28,24 @@ export function Layout({ children }: { children: React.ReactNode }) {
                 <Meta />
                 <Links />
             </head>
-            <body className='min-h-screen font-sans'>
-                <header className='flex items-center p-4 bg-gray-200 dark:bg-gray-800'>
-                    <Link to='/' className='text-2xl font-bold text-blue-600 dark:text-blue-400'>
-                        MCP Explorer
-                    </Link>
-                    <nav className='ml-4 flex gap-4'>
-                        <Link
-                            to='/'
-                            className='text-blue-500 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 font-medium transition-colors'
-                        >
-                            Explorer
-                        </Link>
-                        <Link
-                            to='/url-viewer'
-                            className='text-blue-500 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 font-medium transition-colors'
-                        >
-                            SSE Url Viewer
-                        </Link>
-                    </nav>
-                </header>
-                <DarkModeToggle />
-                {children}
+            <body>
+                <Layout style={{ minHeight: '100vh' }}>
+                    <Header style={{ display: 'flex', alignItems: 'center' }}>
+                        <div className='logo' />
+                        <Menu theme='dark' mode='horizontal' defaultSelectedKeys={['1']}>
+                            <Menu.Item key='1'>
+                                <a href='/'>Explorer</a>
+                            </Menu.Item>
+                            <Menu.Item key='2'>
+                                <a href='/url-viewer'>SSE Url Viewer</a>
+                            </Menu.Item>
+                        </Menu>
+                        <DarkModeToggle />
+                    </Header>
+                    <Content style={{ padding: '0 50px' }}>
+                        {children}
+                    </Content>
+                </Layout>
                 <ScrollRestoration />
                 <Scripts />
             </body>

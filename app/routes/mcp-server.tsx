@@ -1,8 +1,12 @@
 import { useParams } from 'react-router';
 import { useEffect, useState } from 'react';
+import { Spin, Layout, Typography } from 'antd';
 import getConfig from '../helpers/getConfig';
 import type { MCPServer } from '../models/MCPServer';
 import MCPServerComponent from '../components/MCPServerComponent';
+
+const { Content } = Layout;
+const { Title, Paragraph } = Typography;
 
 export default function McpServer() {
     const { id } = useParams();
@@ -16,8 +20,14 @@ export default function McpServer() {
             .finally(() => setLoadingConfig(false));
     }, [id]);
 
-    if (loadingConfig) return <p className='text-center text-lg font-semibold'>Loading configuration...</p>;
-    if (!server) return <p className='text-center text-lg font-semibold'>Server not found.</p>;
+    if (loadingConfig) return <Spin tip='Loading configuration...' />;
+    if (!server) return <Paragraph className='text-center text-lg font-semibold'>Server not found.</Paragraph>;
 
-    return <MCPServerComponent server={server} />;
+    return (
+        <Layout style={{ padding: '24px', maxWidth: '1200px', margin: '0 auto' }}>
+            <Content>
+                <MCPServerComponent server={server} />
+            </Content>
+        </Layout>
+    );
 }
