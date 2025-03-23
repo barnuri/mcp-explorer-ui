@@ -1,7 +1,7 @@
 {
     "mcpServers": [
         {
-            "name": "Supergateway",
+            "name": "Server 1",
             "description": "",
             "labels": [
                 "Label1",

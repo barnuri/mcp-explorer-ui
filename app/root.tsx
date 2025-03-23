@@ -6,6 +6,7 @@ import './app.css';
 import { DarkModeToggle } from './components/DarkModeToggle';
 import '@ant-design/v5-patch-for-react-19';
 import { useEffect, useState } from 'react';
+import { baseURL } from './routes';
 
 const { Header, Content, Footer } = AntLayout;
 const { darkAlgorithm, defaultAlgorithm } = theme;
@@ -98,8 +99,8 @@ export function Layout({ children }: { children: React.ReactNode }) {
                                 // Use same theme for both modes and let ConfigProvider handle colors
                                 mode='horizontal'
                                 items={[
-                                    { key: '1', label: <Link to='/'>Explorer</Link> },
-                                    { key: '2', label: <Link to='/url-viewer'>SSE Url Viewer</Link> },
+                                    { key: '1', label: <Link to={baseURL}>Explorer</Link> },
+                                    { key: '2', label: <Link to={`${baseURL}url-viewer`}>SSE Url Viewer</Link> },
                                 ]}
                                 defaultSelectedKeys={['1']}
                                 style={{

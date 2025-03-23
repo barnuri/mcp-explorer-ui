@@ -7,6 +7,7 @@ export default defineConfig({
     base: process.env.BASE_PATH ? process.env.BASE_PATH : undefined,
     plugins: [tailwindcss(), reactRouter(), tsconfigPaths()],
     define: {
-        'process.env.CONFIG_PATH': JSON.stringify(process.env.CONFIG_PATH || '/config.json'),
+        // Updated to support relative paths with the base URL
+        'process.env.CONFIG_PATH': JSON.stringify(process.env.CONFIG_PATH || 'config.json'),
     },
 });
