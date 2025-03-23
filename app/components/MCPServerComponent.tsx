@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
-import { Tabs, Spin, Tag, Button, Input, Modal, Form } from 'antd';
-import { getTools, getPrompts, getResources, type MCPTool, type MCPPrompt, type MCPResource } from '../helpers/mcp';
+import { Tabs, Spin, Tag, Button, Input, Modal, Form, Select } from 'antd';
+import { getTools, getPrompts, getResources, type MCPTool, type MCPPrompt, type MCPResource, callTool } from '../helpers/mcp';
 import type { MCPServer } from '../models/MCPServer';
 import { MCPToolComponent } from './MCPToolComponent';
 
@@ -12,11 +12,16 @@ export default function MCPServerComponent({ server }: { server: MCPServer }) {
     const [isModalVisible, setIsModalVisible] = useState(false);
     const [selectedItem, setSelectedItem] = useState<any>(null);
     const [form] = Form.useForm();
+    const serverDict = { ...(server.sseUrlDict || {}), ...(server.offlineDataDict || {}) };
+    const envs = Object.keys(serverDict);
+    const [selectedEnv, setSelectedEnv] = useState(envs[0] || '');
+    const sseUrl = envs.length > 0 && server.sseUrlDict ? server.sseUrlDict[selectedEnv] : server.sseUrl;
+    const offlineData = envs.length > 0 && server.offlineDataDict ? server.offlineDataDict[selectedEnv] : server.offlineData;
 
     useEffect(() => {
-        if (server?.sseUrl) {
+        if (sseUrl) {
             setLoading(true);
-            const url = new URL(server.sseUrl);
+            const url = new URL(sseUrl);
             Promise.all([getTools(url), getPrompts(url), getResources(url)])
                 .then(([toolsData, promptsData, resourcesData]) => {
                     setTools(toolsData);
@@ -25,7 +30,13 @@ export default function MCPServerComponent({ server }: { server: MCPServer }) {
                 })
                 .finally(() => setLoading(false));
         }
-    }, [server]);
+        if (offlineData) {
+            setTools(offlineData.tools || []);
+            setPrompts(offlineData.prompts || []);
+            setResources(offlineData.resources || []);
+            setLoading(false);
+        }
+    }, [server, selectedEnv]);
 
     const showModal = (item: any) => {
         setSelectedItem(item);
@@ -33,14 +44,26 @@ export default function MCPServerComponent({ server }: { server: MCPServer }) {
     };
 
     const handleOk = () => {
+        if (!sseUrl) {
+            return;
+        }
         form.validateFields().then(values => {
             console.log('Parameters:', values);
             setIsModalVisible(false);
+            callTool(new URL(sseUrl!), selectedItem, values);
         });
     };
 
     const handleCancel = () => {
         setIsModalVisible(false);
+    };
+
+    const handleEnvChange = (value: string) => {
+        setSelectedEnv(value);
+        setLoading(true);
+        setTools([]);
+        setPrompts([]);
+        setResources([]);
     };
 
     if (!server) return <p className='text-center text-lg font-semibold'>Server not found.</p>;
@@ -56,61 +79,105 @@ export default function MCPServerComponent({ server }: { server: MCPServer }) {
                     </Tag>
                 ))}
             </div>
+
+            {envs.length > 0 && (
+                <div style={{ marginTop: '16px', marginBottom: '16px' }}>
+                    <span style={{ marginRight: '8px', fontWeight: 'bold' }}>Environment:</span>
+                    <Select value={selectedEnv} onChange={handleEnvChange} style={{ width: 200 }}>
+                        {envs.map(env => (
+                            <Select.Option key={env} value={env}>
+                                {env}
+                            </Select.Option>
+                        ))}
+                    </Select>
+                </div>
+            )}
+
             <div style={{ marginTop: '24px' }}>
-                <Tabs defaultActiveKey='tools'>
-                    <Tabs.TabPane tab='Tools' key='tools'>
-                        {loading ? (
-                            <Spin tip='Loading tools...' />
-                        ) : (
-                            <ul style={{ listStyle: 'none', padding: 0 }}>
-                                {tools.map((tool, i) => (
-                                    <li key={i} style={{ marginBottom: '8px' }}>
-                                        <MCPToolComponent tool={tool} />
-                                        <Button type='primary' onClick={() => showModal(tool)}>
+                <Tabs
+                    defaultActiveKey='tools'
+                    items={[
+                        {
+                            tabKey: 'Tools',
+                            label: 'Tools',
+                            key: 'Tools',
+                            children: loading ? (
+                                <Spin />
+                            ) : (
+                                <ul style={{ listStyle: 'none', padding: 0 }}>
+                                    {tools.map((tool, i) => (
+                                        <li key={i} style={{ marginBottom: '8px' }}>
+                                            <MCPToolComponent tool={tool} />
+                                            <Button style={{ marginTop: 15 }} type='primary' onClick={() => showModal(tool)}>
+                                                Execute with Parameters
+                                            </Button>
+                                        </li>
+                                    ))}
+                                </ul>
+                            ),
+                        },
+                        {
+                            tabKey: 'Prompts',
+                            label: 'Prompts',
+                            key: 'Prompts',
+                            children: loading ? (
+                                <Spin />
+                            ) : (
+                                <ul style={{ listStyle: 'none', padding: 0 }}>
+                                    {prompts.map((prompt, i) => (
+                                        <li
+                                            key={i}
+                                            style={{
+                                                padding: '16px',
+                                                border: '1px solid #d9d9d9',
+                                                borderRadius: '4px',
+                                                backgroundColor: '#f5f5f5',
+                                                marginBottom: '8px',
+                                            }}
+                                        >
+                                            {prompt.name}
+                                            {prompt.description}
+                                            {/* <Button type='primary' onClick={() => showModal(prompt)}>
                                             Execute with Parameters
-                                        </Button>
-                                    </li>
-                                ))}
-                            </ul>
-                        )}
-                    </Tabs.TabPane>
-                    <Tabs.TabPane tab='Prompts' key='prompts'>
-                        {loading ? (
-                            <Spin tip='Loading prompts...' />
-                        ) : (
-                            <ul style={{ listStyle: 'none', padding: 0 }}>
-                                {prompts.map((prompt, i) => (
-                                    <li key={i} style={{ padding: '16px', border: '1px solid #d9d9d9', borderRadius: '4px', backgroundColor: '#f5f5f5', marginBottom: '8px' }}>
-                                        {prompt.name}
-                                        {prompt.description}
-                                        <Button type='primary' onClick={() => showModal(prompt)}>
+                                        </Button> */}
+                                        </li>
+                                    ))}
+                                </ul>
+                            ),
+                        },
+                        {
+                            tabKey: 'Resources',
+                            label: 'Resources',
+                            key: 'Resources',
+                            children: loading ? (
+                                <Spin />
+                            ) : (
+                                <ul style={{ listStyle: 'none', padding: 0 }}>
+                                    {resources.map((resource, i) => (
+                                        <li
+                                            key={i}
+                                            style={{
+                                                padding: '16px',
+                                                border: '1px solid #d9d9d9',
+                                                borderRadius: '4px',
+                                                backgroundColor: '#f5f5f5',
+                                                marginBottom: '8px',
+                                            }}
+                                        >
+                                            {resource.name}
+                                            {resource.description}
+                                            {/* <Button type='primary' onClick={() => showModal(resource)}>
                                             Execute with Parameters
-                                        </Button>
-                                    </li>
-                                ))}
-                            </ul>
-                        )}
-                    </Tabs.TabPane>
-                    <Tabs.TabPane tab='Resources' key='resources'>
-                        {loading ? (
-                            <Spin tip='Loading resources...' />
-                        ) : (
-                            <ul style={{ listStyle: 'none', padding: 0 }}>
-                                {resources.map((resource, i) => (
-                                    <li key={i} style={{ padding: '16px', border: '1px solid #d9d9d9', borderRadius: '4px', backgroundColor: '#f5f5f5', marginBottom: '8px' }}>
-                                        {resource.name}
-                                        {resource.description}
-                                        <Button type='primary' onClick={() => showModal(resource)}>
-                                            Execute with Parameters
-                                        </Button>
-                                    </li>
-                                ))}
-                            </ul>
-                        )}
-                    </Tabs.TabPane>
-                </Tabs>
+                                        </Button> */}
+                                        </li>
+                                    ))}
+                                </ul>
+                            ),
+                        },
+                    ]}
+                />
             </div>
-            <Modal title='Execute with Parameters' visible={isModalVisible} onOk={handleOk} onCancel={handleCancel}>
+            <Modal title='Execute with Parameters' open={isModalVisible} onOk={handleOk} onCancel={handleCancel}>
                 <Form form={form} layout='vertical'>
                     {selectedItem?.inputSchema &&
                         Object.keys(selectedItem.inputSchema.properties).map((key: string) => (

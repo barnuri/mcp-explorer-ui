@@ -5,14 +5,15 @@ import type { MCPTool } from '../helpers/mcp';
 export function MCPToolComponent({ tool }: { tool: MCPTool }) {
     const [expanded, setExpanded] = useState(true);
     const toolSchema: { [key: string]: { type: string; description: string } } = (tool.inputSchema.properties as any) || {};
+    let displayName = tool.name;
+    if (!isNaN(parseInt(tool.name.replaceAll('-', '')))) {
+        displayName = tool.description || '';
+    } else {
+        displayName = `${tool.name} - ${tool.description}`;
+    }
     return (
-        <Collapse
-            title={tool.name}
-            className='mb-2'
-            activeKey={expanded ? '1' : undefined}
-            onChange={() => setExpanded(!expanded)}
-        >
-            <Collapse.Panel header={tool.description} key='1'>
+        <Collapse className='mb-2' activeKey={expanded ? '1' : undefined} onChange={() => setExpanded(!expanded)}>
+            <Collapse.Panel header={displayName} key='1'>
                 {tool.inputSchema && (
                     <ul className='mt-2 space-y-1'>
                         {Object.keys(toolSchema).map((key, i) => (

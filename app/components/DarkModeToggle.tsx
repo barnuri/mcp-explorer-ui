@@ -33,7 +33,7 @@ export function DarkModeToggle() {
             icon={darkMode ? <SunOutlined /> : <MoonOutlined />}
             style={{
                 marginLeft: 'auto',
-                color: darkMode ? token.colorTextBase : 'white',
+                color: token.colorTextBase,
             }}
         >
             {darkMode ? 'Light Mode' : 'Dark Mode'}

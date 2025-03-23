@@ -45,6 +45,10 @@ export function Layout({ children }: { children: React.ReactNode }) {
         return () => window.removeEventListener('themeChange', checkTheme);
     }, []);
 
+    // Define consistent header colors for both themes
+    const headerBgColor = isDarkMode ? '#141414' : '#ffffff';
+    const headerTextColor = isDarkMode ? '#ffffff' : '#000000';
+
     return (
         <html lang='en' data-theme={isDarkMode ? 'dark' : 'light'}>
             <head>
@@ -62,21 +66,49 @@ export function Layout({ children }: { children: React.ReactNode }) {
                             colorTextBase: isDarkMode ? '#ffffff' : '#000000',
                             borderRadius: 6,
                         },
+                        components: {
+                            Menu: {
+                                // Make menu styles consistent across themes
+                                itemBg: headerBgColor,
+                                itemColor: headerTextColor,
+                                itemHoverColor: headerTextColor,
+                                itemSelectedColor: headerTextColor,
+                                itemSelectedBg: isDarkMode ? '#333' : '#e6f7ff',
+                                itemHoverBg: isDarkMode ? '#333' : '#e6f7ff',
+                            },
+                            Layout: {
+                                // Ensure header colors are consistent
+                                headerBg: headerBgColor,
+                                headerColor: headerTextColor,
+                            },
+                        },
                     }}
                 >
                     <AntLayout style={{ minHeight: '100vh' }}>
-                        <Header style={{ display: 'flex', alignItems: 'center' }}>
+                        <Header
+                            style={{
+                                display: 'flex',
+                                alignItems: 'center',
+                                backgroundColor: headerBgColor,
+                                color: headerTextColor,
+                            }}
+                        >
                             <div className='logo' />
                             <Menu
-                                theme={isDarkMode ? 'dark' : 'light'}
+                                // Use same theme for both modes and let ConfigProvider handle colors
                                 mode='horizontal'
                                 items={[
                                     { key: '1', label: <Link to='/'>Explorer</Link> },
                                     { key: '2', label: <Link to='/url-viewer'>SSE Url Viewer</Link> },
                                 ]}
                                 defaultSelectedKeys={['1']}
-                                style={{ flex: 1 }}
-                            ></Menu>
+                                style={{
+                                    flex: 1,
+                                    backgroundColor: headerBgColor,
+                                    color: headerTextColor,
+                                    borderBottom: 'none', // Remove the default border
+                                }}
+                            />
                             <DarkModeToggle />
                         </Header>
                         <Content

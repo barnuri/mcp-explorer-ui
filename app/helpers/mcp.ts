@@ -42,3 +42,9 @@ export async function getResources(url: URL): Promise<MCPResource[]> {
     const resources = await client.listResources();
     return resources.resources;
 }
+
+export async function callTool(url: URL, tool: MCPTool, parameters: any): Promise<any> {
+    const client = await getClient(url);
+    const result = await client.callTool({ name: tool.name, arguments: parameters });
+    return result;
+}

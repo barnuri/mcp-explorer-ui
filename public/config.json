@@ -1,13 +1,34 @@
 {
     "mcpServers": [
         {
-            "name": "Server 1",
-            "description": "Description for Server 1",
+            "name": "Supergateway",
+            "description": "",
             "labels": [
                 "Label1",
                 "Label2"
             ],
-            "sseUrl": "https://example.com/sse1"
+            "offlineData": {
+                "tools": [
+                    {
+                        "name": "000000-000000-000000",
+                        "description": "tool 1",
+                        "inputSchema": {
+                            "properties": {
+                                "input1": {
+                                    "name": "input1",
+                                    "type": "string",
+                                    "description": "input 1"
+                                },
+                                "input2": {
+                                    "name": "input2",
+                                    "type": "string",
+                                    "description": "input 2"
+                                }
+                            }
+                        }
+                    }
+                ]
+            }
         },
         {
             "name": "Server 2",
@@ -16,7 +37,74 @@
                 "Label3",
                 "Label4"
             ],
-            "sseUrl": "https://example.com/sse2"
+            "offlineDataDict": {
+                "dev": {
+                    "tools": [
+                        {
+                            "name": "000000-000000-000000",
+                            "description": "dev tool 1",
+                            "inputSchema": {
+                                "properties": {
+                                    "dev_input1": {
+                                        "name": "dev_input1",
+                                        "type": "string",
+                                        "description": "input 1"
+                                    },
+                                    "dev_input2": {
+                                        "name": "dev_input2",
+                                        "type": "string",
+                                        "description": "input 2"
+                                    }
+                                }
+                            }
+                        }
+                    ]
+                },
+                "stg": {
+                    "tools": [
+                        {
+                            "name": "000000-000000-000000",
+                            "description": "stg tool 1",
+                            "inputSchema": {
+                                "properties": {
+                                    "stg_input1": {
+                                        "name": "stg_input1",
+                                        "type": "string",
+                                        "description": "input 1"
+                                    },
+                                    "stg_input2": {
+                                        "name": "stg_input2",
+                                        "type": "string",
+                                        "description": "input 2"
+                                    }
+                                }
+                            }
+                        }
+                    ]
+                },
+                "prod": {
+                    "tools": [
+                        {
+                            "name": "000000-000000-000000",
+                            "description": "prod tool 1",
+                            "inputSchema": {
+                                "properties": {
+                                    "prod_input1": {
+                                        "name": "prod_input1",
+                                        "type": "string",
+                                        "description": "input 1"
+                                    },
+                                    "prod_input2": {
+                                        "name": "prod_input2",
+                                        "type": "string",
+                                        "description": "input 2"
+                                    }
+                                }
+                            }
+                        }
+                    ]
+                }
+            }
         }
     ]
 }

@@ -20,7 +20,7 @@ export default function McpServer() {
             .finally(() => setLoadingConfig(false));
     }, [id]);
 
-    if (loadingConfig) return <Spin tip='Loading configuration...' />;
+    if (loadingConfig) return <Spin />;
     if (!server) return <Paragraph className='text-center text-lg font-semibold'>Server not found.</Paragraph>;
 
     return (
