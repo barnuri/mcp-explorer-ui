@@ -9,5 +9,6 @@ export default defineConfig({
     define: {
         // Updated to support relative paths with the base URL
         'process.env.CONFIG_PATH': JSON.stringify(process.env.CONFIG_PATH || 'config.json'),
+        'process.env.BASE_PATH': JSON.stringify(process.env.BASE_PATH || '/'),
     },
 });
