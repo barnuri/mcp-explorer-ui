@@ -23,7 +23,7 @@ jobs:
               run: npm i
 
             - name: Build the project
-              run: BASE_PATH=/mcp-explorer-ui npm run build
+              run: BASE_PATH=/mcp-explorer-ui/ npm run build
 
             - name: Upload static files as artifact
               uses: actions/upload-pages-artifact@v3
