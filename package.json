@@ -11,7 +11,7 @@
         "build": "react-router build",
         "dev": "react-router dev",
         "dev:github": "cross-env BASE_PATH=/mcp-explorer-ui/ npm run dev",
-        "start": "serve ./build/client",
+        "start": "serve -s ./build/client",
         "start:ssr": "react-router-serve ./build/server/index.js",
         "typecheck": "react-router typegen && tsc",
         "deploy": "npm run build && npx gh-pages -d build"
